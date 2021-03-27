@@ -1,26 +1,21 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"io"
+	"os"
+)
 
 func main() {
-	numbers := []int{}
-	for i := 0; i < 11; i++ {
-		numbers = append(numbers, i)
-	}
+	args := os.Args
 
-	for i, number := range numbers {
-		fmt.Printf("%v is %v\n", i, toString(isEven(number)))
-	}
-}
-
-func isEven(number int) bool {
-	return number%2 == 0
-}
-
-func toString(isEven bool) string {
-	if isEven {
-		return "even"
-	} else {
-		return "odd"
+	for _, filename := range args[1:] {
+		file, err := os.Open(filename)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		io.Copy(os.Stdout, file)
+		fmt.Println()
 	}
 }
