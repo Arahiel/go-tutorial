@@ -1,0 +1,22 @@
+{
+	"users": [
+		{
+			"name": "Modified name",
+			"type": "Reader",
+			"age": 23,
+			"social": {
+				"facebook": "Modified fb link",
+				"twitter": "https://twitter.com"
+			}
+		},
+		{
+			"name": "Fraser",
+			"type": "Author",
+			"age": 17,
+			"social": {
+				"facebook": "https://facebook.com",
+				"twitter": "https://twitter.com"
+			}
+		}
+	]
+}

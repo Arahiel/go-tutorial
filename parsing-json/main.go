@@ -41,10 +41,18 @@ func main() {
 
 	fileContent, _ := io.ReadAll(jsonFile)
 
-	var db UsersDb
-	json.Unmarshal(fileContent, &db)
-	printUsers(db.Users)
+	var usersDb UsersDb
+	json.Unmarshal(fileContent, &usersDb)
+	printUsers(usersDb.Users)
 
+	usersDb.Users[0].Name = "Modified name"
+	usersDb.Users[0].Social.Facebook = "Modified fb link"
+
+	output, _ := json.MarshalIndent(usersDb, "", "	")
+	os.WriteFile("output.json", output, 0666)
+
+	singleUserOutput, _ := json.MarshalIndent(usersDb.Users[0], "", "	")
+	os.WriteFile("singleUserOutput.json", singleUserOutput, 0666)
 }
 
 func printUsers(users []User) {

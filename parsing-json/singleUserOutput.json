@@ -1,0 +1,9 @@
+{
+	"name": "Modified name",
+	"type": "Reader",
+	"age": 23,
+	"social": {
+		"facebook": "Modified fb link",
+		"twitter": "https://twitter.com"
+	}
+}
