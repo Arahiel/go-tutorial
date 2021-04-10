@@ -1,0 +1,46 @@
+version: '3.8'
+# docker-compose up -d
+
+services:
+  # postgres
+  db: 
+    image: postgres
+    restart: always
+    env_file:
+      - ".env"
+    # environment:
+    #   POSTGRES_USER: postgres
+    #   POSTGRES_PASSWORD: postgres
+    #   POSTGRES_DB: db_example
+    ports:
+      - "5432:5432"
+    networks:
+      - backend
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+    depends_on:
+      - db
+
+  app:
+    image: my-go-app
+    restart: always
+    ports:
+      - "8081:8081"
+    networks:
+      - backend
+    depends_on:
+      - db
+
+networks:
+  backend:
+
+volumes:
+  pgdata:

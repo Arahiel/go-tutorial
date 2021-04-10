@@ -5,19 +5,26 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	_ "github.com/joho/godotenv/autoload"
 )
 
-var connectionString = "host=localhost port=5432 user=postgres dbname=postgres password=postgres sslmode=disable"
+var connectionString string
 var driverName = "postgres"
 
 type User struct {
 	gorm.Model
 	Name  string
 	Email string
+}
+
+func init() {
+	connectionString = fmt.Sprintf("host=db port=5432 user=%v dbname=%v password=%v sslmode=disable", os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_DB"), os.Getenv("POSTGRES_PASSWORD"))
+	fmt.Println(connectionString)
 }
 
 func initialMigration() {
