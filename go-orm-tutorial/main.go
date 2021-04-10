@@ -40,19 +40,25 @@ func handleRequests() {
 	log.Fatal(http.ListenAndServe(":8081", router))
 }
 
-func allUsersGetHandler(w http.ResponseWriter, r *http.Request) {
+func doActionOnDb(action func(db *gorm.DB)) {
 	db, err := gorm.Open(driverName, connectionString)
+	gorm.Open(driverName, connectionString)
 	if err != nil {
 		fmt.Println(err.Error())
 		panic("Failed to connect to the database")
 	}
+	action(db)
 	defer db.Close()
+}
 
-	var users []User
-	db.Find(&users)
-	fmt.Println(users)
+func allUsersGetHandler(w http.ResponseWriter, r *http.Request) {
+	doActionOnDb(func(db *gorm.DB) {
+		var users []User
+		db.Find(&users)
+		fmt.Println(users)
+		json.NewEncoder(w).Encode(users)
+	})
 
-	json.NewEncoder(w).Encode(users)
 }
 
 func userPostHandler(w http.ResponseWriter, r *http.Request) {
@@ -61,15 +67,10 @@ func userPostHandler(w http.ResponseWriter, r *http.Request) {
 	name := vars["name"]
 	email := vars["email"]
 
-	db, err := gorm.Open(driverName, connectionString)
-	if err != nil {
-		fmt.Println(err.Error())
-		panic("Failed to connect to the database")
-	}
-	defer db.Close()
-
-	db.Create(&User{Name: name, Email: email})
-	fmt.Fprintf(w, "New user created successfully")
+	doActionOnDb(func(db *gorm.DB) {
+		db.Create(&User{Name: name, Email: email})
+		fmt.Fprintf(w, "New user created successfully")
+	})
 }
 
 func userPutHandler(w http.ResponseWriter, r *http.Request) {
@@ -78,19 +79,14 @@ func userPutHandler(w http.ResponseWriter, r *http.Request) {
 	name := vars["name"]
 	email := vars["email"]
 
-	db, err := gorm.Open(driverName, connectionString)
-	if err != nil {
-		fmt.Println(err.Error())
-		panic("Failed to connect to the database")
-	}
-	defer db.Close()
+	doActionOnDb(func(db *gorm.DB) {
+		var user User
+		db.Where("name = ?", name).Find(&user)
+		user.Email = email
+		db.Save(&user)
 
-	var user User
-	db.Where("name = ?", name).Find(&user)
-	user.Email = email
-	db.Save(&user)
-
-	fmt.Fprintf(w, "User updated successfully")
+		fmt.Fprintf(w, "User updated successfully")
+	})
 }
 
 func userDeleteHandler(w http.ResponseWriter, r *http.Request) {
@@ -98,18 +94,13 @@ func userDeleteHandler(w http.ResponseWriter, r *http.Request) {
 
 	name := vars["name"]
 
-	db, err := gorm.Open(driverName, connectionString)
-	if err != nil {
-		fmt.Println(err.Error())
-		panic("Failed to connect to the database")
-	}
-	defer db.Close()
+	doActionOnDb(func(db *gorm.DB) {
+		var user User
+		db.Where("name = ?", name).Find(&user)
+		db.Delete(&user)
 
-	var user User
-	db.Where("name = ?", name).Find(&user)
-	db.Delete(&user)
-
-	fmt.Fprintf(w, "User deleted successfully")
+		fmt.Fprintf(w, "User deleted successfully")
+	})
 }
 
 func main() {
