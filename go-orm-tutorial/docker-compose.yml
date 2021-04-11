@@ -8,10 +8,6 @@ services:
     restart: always
     env_file:
       - ".env"
-    # environment:
-    #   POSTGRES_USER: postgres
-    #   POSTGRES_PASSWORD: postgres
-    #   POSTGRES_DB: db_example
     ports:
       - "5432:5432"
     networks:
@@ -30,14 +26,19 @@ services:
       - db
 
   app:
-    image: my-go-app
+    image: golang:1.16.0-alpine3.13
     restart: always
+    command: sh -c "go run ./server/main.go"
+    build: .
+    working_dir: /app
     ports:
       - "8081:8081"
     networks:
       - backend
     depends_on:
       - db
+    volumes: 
+      - .:/app
 
 networks:
   backend:
