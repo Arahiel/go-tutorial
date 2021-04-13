@@ -24,18 +24,12 @@ type User struct {
 
 func init() {
 	connectionString = fmt.Sprintf("host=db port=5432 user=%v dbname=%v password=%v sslmode=disable", os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_DB"), os.Getenv("POSTGRES_PASSWORD"))
-	fmt.Println(connectionString)
 }
 
 func initialMigration() {
-	db, err := gorm.Open(driverName, connectionString)
-	if err != nil {
-		fmt.Println(err.Error())
-		panic("Failed to connect to the database")
-	}
-	defer db.Close()
-
-	db.AutoMigrate(&User{})
+	doActionOnDb(func(db *gorm.DB) {
+		db.AutoMigrate(&User{})
+	})
 }
 
 func handleRequests() {
